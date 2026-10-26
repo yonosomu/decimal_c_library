@@ -1,7 +1,7 @@
 #ifndef S21_TEST_UTILS_H_
 #define S21_TEST_UTILS_H_
 
-#include "check_compat.h"
+#include <check.h>
 #include <stdint.h>
 
 #include "../s21_decimal.h"
