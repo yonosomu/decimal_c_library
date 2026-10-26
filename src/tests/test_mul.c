@@ -1,7 +1,7 @@
 #include <stdint.h>
 
 #include "../s21_big_decimal.h"
-#include "check_compat.h"
+#include <check.h>
 #include "test_utils.h"
 
 START_TEST(s21_test_mul_fraction) {

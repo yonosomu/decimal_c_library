@@ -20,4 +20,6 @@ void s21_test_assert_decimal(s21_decimal value, uint32_t lo, uint32_t mid,
   ck_assert_uint_eq((uint32_t)value.bits[2], hi);
   ck_assert_int_eq((int)((flags >> 16) & 0xFFu), scale);
   ck_assert_int_eq((int)(flags >> 31), negative);
+  ck_assert_uint_eq(flags,
+                    ((uint32_t)scale << 16) | ((uint32_t)negative << 31));
 }

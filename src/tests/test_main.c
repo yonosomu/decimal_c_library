@@ -1,10 +1,4 @@
-#include "check_compat.h"
-
-Suite *s21_suite_big_words(void);
-Suite *s21_suite_add_sub(void);
-Suite *s21_suite_mul(void);
-Suite *s21_suite_div(void);
-Suite *s21_suite_big_convert(void);
+#include "test_suites.h"
 
 int main(void) {
   SRunner *runner = srunner_create(s21_suite_big_words());
@@ -12,6 +6,10 @@ int main(void) {
   srunner_add_suite(runner, s21_suite_mul());
   srunner_add_suite(runner, s21_suite_div());
   srunner_add_suite(runner, s21_suite_big_convert());
+  srunner_add_suite(runner, s21_suite_negate());
+  srunner_add_suite(runner, s21_suite_truncate());
+  srunner_add_suite(runner, s21_suite_floor());
+  srunner_add_suite(runner, s21_suite_round());
   srunner_run_all(runner, CK_NORMAL);
   int failures = srunner_ntests_failed(runner);
   srunner_free(runner);

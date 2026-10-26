@@ -12,5 +12,9 @@ int s21_add(s21_decimal a, s21_decimal b, s21_decimal *result);
 int s21_sub(s21_decimal a, s21_decimal b, s21_decimal *result);
 int s21_mul(s21_decimal a, s21_decimal b, s21_decimal *result);
 int s21_div(s21_decimal a, s21_decimal b, s21_decimal *result);
+int s21_negate(s21_decimal value, s21_decimal *result);
+int s21_truncate(s21_decimal value, s21_decimal *result);
+int s21_floor(s21_decimal value, s21_decimal *result);
+int s21_round(s21_decimal value, s21_decimal *result);
 
 #endif
