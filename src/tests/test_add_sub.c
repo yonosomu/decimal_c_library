@@ -1,7 +1,7 @@
+#include <check.h>
 #include <stdint.h>
 
 #include "../s21_big_decimal.h"
-#include <check.h>
 #include "test_utils.h"
 
 START_TEST(s21_test_add_different_scales) {

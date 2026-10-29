@@ -24,37 +24,37 @@ void srunner_run_all(SRunner *runner, int mode);
 int srunner_ntests_failed(SRunner *runner);
 void srunner_free(SRunner *runner);
 
-#define ck_assert_int_eq(a, b)                                           \
-  do {                                                                   \
-    long long lhs = (long long)(a);                                      \
-    long long rhs = (long long)(b);                                      \
-    if (lhs != rhs) {                                                    \
-      fprintf(stderr, "%s:%d: %s=%lld, %s=%lld\n", __FILE__, __LINE__,  \
-              #a, lhs, #b, rhs);                                         \
-      exit(1);                                                           \
-    }                                                                    \
+#define ck_assert_int_eq(a, b)                                             \
+  do {                                                                     \
+    long long lhs = (long long)(a);                                        \
+    long long rhs = (long long)(b);                                        \
+    if (lhs != rhs) {                                                      \
+      fprintf(stderr, "%s:%d: %s=%lld, %s=%lld\n", __FILE__, __LINE__, #a, \
+              lhs, #b, rhs);                                               \
+      exit(1);                                                             \
+    }                                                                      \
   } while (0)
 
-#define ck_assert_uint_eq(a, b)                                          \
-  do {                                                                   \
-    unsigned long long lhs = (unsigned long long)(a);                    \
-    unsigned long long rhs = (unsigned long long)(b);                    \
-    if (lhs != rhs) {                                                    \
-      fprintf(stderr, "%s:%d: %s=%llu, %s=%llu\n", __FILE__, __LINE__,  \
-              #a, lhs, #b, rhs);                                         \
-      exit(1);                                                           \
-    }                                                                    \
+#define ck_assert_uint_eq(a, b)                                            \
+  do {                                                                     \
+    unsigned long long lhs = (unsigned long long)(a);                      \
+    unsigned long long rhs = (unsigned long long)(b);                      \
+    if (lhs != rhs) {                                                      \
+      fprintf(stderr, "%s:%d: %s=%llu, %s=%llu\n", __FILE__, __LINE__, #a, \
+              lhs, #b, rhs);                                               \
+      exit(1);                                                             \
+    }                                                                      \
   } while (0)
 
-#define ck_assert_ptr_eq(a, b)                                         \
-  do {                                                                 \
-    const void *lhs = (a);                                             \
-    const void *rhs = (b);                                             \
-    if (lhs != rhs) {                                                  \
-      fprintf(stderr, "%s:%d: %s=%p, %s=%p\n", __FILE__, __LINE__,    \
-              #a, lhs, #b, rhs);                                       \
-      exit(1);                                                         \
-    }                                                                  \
+#define ck_assert_ptr_eq(a, b)                                              \
+  do {                                                                      \
+    const void *lhs = (a);                                                  \
+    const void *rhs = (b);                                                  \
+    if (lhs != rhs) {                                                       \
+      fprintf(stderr, "%s:%d: %s=%p, %s=%p\n", __FILE__, __LINE__, #a, lhs, \
+              #b, rhs);                                                     \
+      exit(1);                                                              \
+    }                                                                       \
   } while (0)
 
 #endif

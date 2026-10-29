@@ -1,8 +1,8 @@
+#include <check.h>
 #include <stdint.h>
 #include <string.h>
 
 #include "../s21_big_decimal.h"
-#include <check.h>
 
 START_TEST(test_pointer_contiguous_memory) {
   s21_big_decimal x = {.mantissa = {1, 2, 3}, .scale = 7, .sign = 1};
