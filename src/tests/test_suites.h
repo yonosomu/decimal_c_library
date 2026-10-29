@@ -12,5 +12,9 @@ Suite *s21_suite_negate(void);
 Suite *s21_suite_truncate(void);
 Suite *s21_suite_floor(void);
 Suite *s21_suite_round(void);
+Suite *comparison_suite(void);
+Suite *conversion_int_suite(void);
+Suite *conversion_float_suite(void);
+Suite *s21_suite_integration(void);
 
 #endif

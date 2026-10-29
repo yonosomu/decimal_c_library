@@ -3,7 +3,7 @@ AR = ar
 CFLAGS = -std=c11 -Wall -Wextra -Werror -pedantic
 CPPFLAGS =
 LDFLAGS =
-LDLIBS =
+LDLIBS = -lm
 BUILD_DIR ?= .build/normal
 LIBRARY ?= s21_decimal.a
 SANITIZERS ?= undefined
@@ -16,7 +16,8 @@ GCOV ?= $(if $(findstring clang,$(shell $(CC) --version)),$(if $(filter Darwin,$
 
 SRC = common/s21_big_words.c common/s21_big_convert.c \
       arithmetic/s21_add.c arithmetic/s21_sub.c \
-      arithmetic/s21_mul.c arithmetic/s21_div.c $(wildcard other/*.c)
+      arithmetic/s21_mul.c arithmetic/s21_div.c $(wildcard other/*.c) \
+      $(wildcard comparison/*.c conversion/*.c)
 OBJ = $(addprefix $(BUILD_DIR)/,$(SRC:.c=.o))
 TEST_SRC = $(wildcard tests/test_*.c)
 TEST_OBJ = $(addprefix $(BUILD_DIR)/,$(TEST_SRC:.c=.o))
@@ -57,7 +58,7 @@ gcov_report:
 	CK_FORK=no $(MAKE) test BUILD_DIR=.build/coverage \
 	  LIBRARY=.build/coverage/s21_decimal.a \
 	  CFLAGS='$(CFLAGS) -O0 -g --coverage' LDFLAGS='$(LDFLAGS) --coverage'
-	$(GCOVR) --root . --filter 'common/|arithmetic/|other/' \
+	$(GCOVR) --root . --filter 'common/|arithmetic/|other/|comparison/|conversion/' \
 	  --gcov-executable '$(GCOV)' --html-details .build/coverage/index.html \
 	  --json .build/coverage/coverage.json --print-summary .build/coverage
 
