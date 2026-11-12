@@ -1,5 +1,15 @@
 # decimal_c_library
 
+<!-- tech-stack-badges -->
+<p align="center">
+<img alt="C" src="https://img.shields.io/badge/C-C11-A8B9CC?style=for-the-badge&amp;logo=c&amp;logoColor=white" />
+<img alt="Make" src="https://img.shields.io/badge/Make-Build-427819?style=for-the-badge&amp;logo=gnu&amp;logoColor=white" />
+<img alt="Check" src="https://img.shields.io/badge/Check-Tests-4B5563?style=for-the-badge" />
+<img alt="gcovr" src="https://img.shields.io/badge/gcovr-Coverage-2563EB?style=for-the-badge" />
+<img alt="Valgrind" src="https://img.shields.io/badge/Valgrind-Memory%20Checks-7C3AED?style=for-the-badge" />
+</p>
+<!-- /tech-stack-badges -->
+
 A C11 static library for decimal arithmetic with a 96-bit coefficient, an explicit sign, and a decimal scale from 0 to 28.
 
 The library provides arithmetic, comparisons, integer and floating-point conversions, and integer-rounding operations through `s21_decimal.h`. Intermediate calculations use a fixed-size 256-bit representation instead of `__int128`.
