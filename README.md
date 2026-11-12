@@ -1,191 +1,243 @@
-# s21_decimal 
+# decimal_c_library
 
-Implementation of your own s21_decimal.h library.
+A C11 static library for decimal arithmetic with a 96-bit coefficient, an explicit sign, and a decimal scale from 0 to 28.
 
-💡 [Tap here](https://new.oprosso.net/p/4cb31ec3f47a4596bc758ea1861fb624) **to leave your feedback on the project**. It's anonymous and will help our team make your educational experience better. We recommend completing the survey immediately after the project.
+The library provides arithmetic, comparisons, integer and floating-point conversions, and integer-rounding operations through `s21_decimal.h`. Intermediate calculations use a fixed-size 256-bit representation instead of `__int128`.
 
-## Contents
+## Features
 
-1. [Chapter I](#chapter-i) \
-   1.1. [Introduction](#introduction)
-2. [Chapter II](#chapter-ii) \
-   2.1. [Information](#information)
-3. [Chapter III](#chapter-iii) \
-   3.1. [Part 1](#part-1-implementation-of-the-decimalh-library-functions)
+- Addition, subtraction, multiplication, and division.
+- Six numerical comparison operations, including comparison of equivalent values with different scales.
+- Conversions between decimal and `int`, and between decimal and binary32 `float`.
+- Negation, truncation, floor, and rounding to the nearest integer.
+- Multiword integer operations with carry, borrow, shifts, multiplication, and quotient/remainder division.
+- Round-half-to-even when reducing arithmetic precision and when rounding float conversions to at most seven significant decimal digits.
+- Check-based unit and integration tests, HTML coverage reports, and separate sanitizer builds.
 
-## Instructions 
-
-How to learn at “School 21”:
-
-- Here, you’ll find a unique learning experience with a lot of freedom. You’re given a task and left to find your own way to solve it, using whatever resources work best for you — whether that’s the Internet or AI tools like GigaChat. Just be mindful of information quality: verify, think critically, analyze, and compare.
-- Peer-to-peer (P2P) learning is the exchange of knowledge and experience with peers, where everyone acts as both mentor and student. This approach allows you to gain a deeper understanding of the material by learning from one another.
-- Feel free to ask for help: around you are peers who are also navigating this path for the first time. Share your own experience and ideas with others.  Join Rocket.Chat to stay updated with the latest community announcements. 
-- Your learning is meaningless if you just copy someone else’s solutions. When receiving help from others, always make sure you fully understand the “why”, “how”, and “purpose” behind the solution. Don’t be afraid to make mistakes. 
-- Does the task seem impossible? Take a break, get some fresh air and clear your mind — this has helped many people. Maybe after that, the solution will come to you naturally.
-- The learning process is just as important as the result. It’s not just about completing the task — it’s about understanding HOW to solve it. 
-
-## Chapter I
-
-![s21_decimal](misc/images/s21_decimal.png)
-
-Planet Earth, 1990s. 
-
-The world economy is growing exponentially, the stock market is growing year by year, more and more companies are going public and their shares are listed. The number of users, the number of transactions, the price, the commission, the interest, the calculation of technical financial indicators... It's hard to overestimate the accuracy of all this data, and there are serious problems with the current outdated data types used in the financial sector.
-
-Millions of dollars are lost every year due to a miscalculation in the IEEE 754 (float) standard that simply disappears from the system. 
-
-In addition to the FIX (Financial Information eXchange) protocol, which is being developed to handle data between the broker and the exchange, another tool is needed to transfer and store data.
-
-At the follow-up meeting:
-
-*"So, gentlemen, please note that our group of specialists, who have already proven themselves in many successful projects, have been commissioned by the government to develop a completely new type of data, code-named Decimal. Its purpose is to make it possible to significantly reduce, and in some cases eliminate, errors in the world's financial transactions for several decades. It is required to describe all the necessary logical and arithmetic operations that would allow the necessary calculations to be performed quickly and conveniently."*
-
-*"Wow, that's quite an order we got, and from such a customer! We have to keep this client — it promises us big contracts in the future if we do well!"*
-
-*"Yes, you're right, that's why we need to think about what features to implement... Any suggestions?"*
-
-*"Sum and difference..."*
-
-*"Multiplication and division..."*
-
-*"Agreed, but we need more!"*
-
-*"Take the remainder, comparison and conversion operations!"*
-
-*"Mathematical rounding in all directions!"*
-
-*"Yes, I think that's enough, let's get to work! We only have a few days left, don't let us down!"*
-
-## Introduction
-
-In this project you will implement the library s21_decimal.h in the programming language C. The purpose of this library is to add the ability to work with the "decimal" type, which is not in the language standard. However, this type is very important. For example, for financial calculations, where calculation errors characteristic of floating-point types are unacceptable. As part of the project, you will work with the tasks of processing financial information, dive into the issues of internal representation of different types of data, and solidify your knowledge of structured programming.
-
-## Chapter II
-
-## Information
-
-The Decimal value type represents decimal numbers from positive 79,228,162,514,264,337,593,543,950,335 to negative 79,228,162,514,264,337,593,543,950,335. The default value of a Decimal is 0. The Decimal value type is suitable for financial calculations that require a large number of significant integral and fractional digits and that do not have rounding errors. The Decimal type does not eliminate the need for rounding. Rather, it minimizes rounding errors.
-
-When the result of the division and multiplication is passed to the Round method, the result suffers no loss of precision.
-
-A Decimal number is a floating point value that consists of a sign, a numerical value where each digit in the value ranges from 0 to 9, and a scaling factor that indicates the position of a floating decimal point that separates the integral and fractional parts of the numerical value.
-
-The binary representation of a Decimal value consists of a 1-bit sign, a 96-bit integer, and a scaling factor that is used to divide the 96-bit integer and specify what portion of it is a Decimal fraction. The scaling factor is implicitly the number 10 raised to an exponent between 0 and 28. Therefore, the binary representation of a Decimal value has the form ((-2^96 to 2^96) / 10^(0 to 28)), where -(2^96-1) is equal to MinValue and 2^96-1 is equal to MaxValue.
-
-The scaling factor can also preserve any trailing zeros in a Decimal number. Trailing zeros do not affect the value of a Decimal number in arithmetic or comparison operations. 
-
-### Binary representation
-
-The binary representation of a Decimal number consists of a 1-bit sign, a 96-bit integer number, and a scaling factor that is used to divide the integer number and specify what portion of it is a decimal fraction. The scaling factor is implicitly the number 10 raised to an exponent between 0 and 28.
-
-The Decimal number can be implemented as a four-element array of 32-bit signed integers (`int bits[4];`).
-
-`bits[0]`, `bits[1]`, and `bits[2]` contain the low, middle, and high 32 bits of the 96-bit integer, respectively.
-
-`bits[3]` contains the scaling factor and sign and consists of the following parts:
-- Bits 0 through 15, the lower word, are unused and must be zero.
-- Bits 16 to 23 must contain an exponent between 0 and 28, indicating the power of 10 to divide the integer.
-- Bits 24 through 30 are unused and must be zero.
-- Bit 31 contains the sign; 0 is positive and 1 is negative.
-
-Note that the bit representation distinguishes between negative and positive zeros. These values can be treated as equal in all operations.
-
-### Example:
+## Representation
 
 ```c
-typedef struct 
-{
-    int bits[4];
+typedef struct {
+  int bits[4];
 } s21_decimal;
 ```
 
-### Arithmetic Operators
+- `bits[0]`, `bits[1]`, and `bits[2]` hold the low, middle, and high words of an unsigned 96-bit coefficient.
+- Bit 31 of `bits[3]` stores the sign.
+- Bits 16 through 23 of `bits[3]` store the scale.
+- All remaining bits of `bits[3]` are reserved and must be zero.
 
-| Operator name | Operators  | Function                                                                           | 
-| ------ | ------ |------------------------------------------------------------------------------------|
-| Addition | + | int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result)         |
-| Subtraction | - | int s21_sub(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) |
-| Multiplication | * | int s21_mul(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) | 
-| Division | / | int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) |
+The numeric value is `(-1)^sign * coefficient / 10^scale`. The maximum coefficient is `2^96 - 1`. The internal header checks that `int` is 32 bits.
 
-The functions return the error code:
-- 0 — OK;
-- 1 — the number is too large or equal to infinity;
-- 2 — the number is too small or equal to negative infinity;
-- 3 — division by 0.
+Different representations can describe the same value. For example, coefficients 15 and 150 with scales 1 and 2 both represent 1.5. Comparisons treat positive and negative zero as numerically equal.
 
-*Note on the numbers that do not fit into the mantissa:*
-- *When getting numbers that do not fit into the mantissa during arithmetic operations, use bank rounding (for example, 79,228,162,514,264,337,593,543,950,335 — 0.6 = 79,228,162,514,264,337,593,543,950,334)*
+## Public API
 
-### Comparison Operators
+| Category | Functions |
+| --- | --- |
+| Arithmetic | `s21_add`, `s21_sub`, `s21_mul`, `s21_div` |
+| Comparison | `s21_is_less`, `s21_is_less_or_equal`, `s21_is_greater`, `s21_is_greater_or_equal`, `s21_is_equal`, `s21_is_not_equal` |
+| Conversion | `s21_from_int_to_decimal`, `s21_from_float_to_decimal`, `s21_from_decimal_to_int`, `s21_from_decimal_to_float` |
+| Other operations | `s21_negate`, `s21_truncate`, `s21_floor`, `s21_round` |
 
-| Operator name | Operators  | Function | 
-| ------ | ------ | ------ |
-| Less than | < | int s21_is_less(s21_decimal, s21_decimal) |
-| Less than or equal to | <= | int s21_is_less_or_equal(s21_decimal, s21_decimal) | 
-| Greater than | > |  int s21_is_greater(s21_decimal, s21_decimal) |
-| Greater than or equal to | >= | int s21_is_greater_or_equal(s21_decimal, s21_decimal) | 
-| Equal to | == |  int s21_is_equal(s21_decimal, s21_decimal) |
-| Not equal to | != |  int s21_is_not_equal(s21_decimal, s21_decimal) |
+Arithmetic functions return a status code and write the computed value through an output pointer:
 
-Return value:
-- 0 — FALSE;
-- 1 — TRUE.
+| Status | Meaning |
+| --- | --- |
+| `0` | Success |
+| `1` | Positive overflow or another rejected arithmetic input |
+| `2` | Negative overflow |
+| `3` | Division by zero |
 
-### Convertors and parsers
+Conversion and other-operation functions return `0` on success and `1` on failure. Comparisons return `1` for true and `0` for false.
 
-| Convertor/parser | Function | 
-| ------ | ------ |
-| From int  | int s21_from_int_to_decimal(int src, s21_decimal *dst) |
-| From float  | int s21_from_float_to_decimal(float src, s21_decimal *dst) |
-| To int  | int s21_from_decimal_to_int(s21_decimal src, int *dst) |
-| To float  | int s21_from_decimal_to_float(s21_decimal src, float *dst) |
+### Rounding and conversion behavior
 
-Return value — code error:
-- 0 — OK;
-- 1 — convertation error.
+- `s21_truncate` discards fractional digits toward zero.
+- `s21_floor` rounds toward negative infinity.
+- `s21_round` rounds to the nearest integer, with exact halves away from zero. This policy is distinct from arithmetic half-to-even rounding.
+- `s21_negate` preserves the coefficient and scale and flips the sign, including the sign of zero.
+- Integer-rounding operations return scale zero and normalize a zero result to positive zero.
+- Decimal-to-int conversion discards the fractional part and rejects results outside the `int` range.
+- Float-to-decimal conversion rejects nonfinite values, nonzero magnitudes below `1e-28`, and magnitudes outside the representable range. It preserves signed zero.
+- Float conversion uses exact integer quotient/remainder calculations for half-to-even rounding. Its significand extraction assumes binary32 `float`.
 
-*Note on the conversion of a float type number:*
-- *If the numbers are too small (0 < |x| < 1e-28), return an error and value equal to 0*.
-- *If the numbers are too large (|x| > 79,228,162,514,264,337,593,543,950,335) or are equal to infinity, return an error*.
-- *When processing a number with the float type, convert all the significant decimal digits contained in it. If there are more than 7 such digits, the number is rounded using bank rounding to the number that does not have more than 7 significant decimal digits.*
+Comparison inputs must contain valid decimal metadata. Invalid reserved bits or an invalid scale are outside the supported comparison contract.
 
-*Note on the conversion from decimal type to int:*
-- *If there is a fractional part in a decimal number, it should be discarded (for example, 0.9 is converted to 0)*.
+## Requirements
 
+For the static library:
 
-### Other functions
+- A C11 compiler, `make`, and `ar`.
+- The math library when linking an executable that uses float conversions (`-lm` on platforms that require it).
 
-| Description | Function                                                         | 
-| ------ |------------------------------------------------------------------|
-| Rounds a specified Decimal number to the closest integer toward negative infinity. | int s21_floor(s21_decimal value, s21_decimal *result)            |	
-| Rounds a decimal value to the nearest integer. | int s21_round(s21_decimal value, s21_decimal *result)    |
-| Returns the integral digits of the specified Decimal; any fractional digits are discarded, including trailing zeroes. | int s21_truncate(s21_decimal value, s21_decimal *result) |
-| Returns the result of multiplying the specified Decimal value by negative one. | int s21_negate(s21_decimal value, s21_decimal *result)   |
+For tests and optional analysis:
 
-Return value — code error:
-- 0 — OK;
-- 1 — calculation error.
+- The Check unit-testing library, discoverable through `pkg-config`.
+- `gcovr` and a compiler-compatible `gcov` implementation for coverage.
+- `clang-format` 18.1.8 for the checked formatting configuration.
+- Valgrind on Linux, or `leaks` on macOS, for a separate memory-leak check.
+- Appropriate compiler runtime libraries for the requested sanitizers.
 
-## Chapter III
+Dependencies are not downloaded or installed by the Makefile. On macOS, `/usr/bin/gcc` may invoke Apple Clang rather than GNU GCC.
 
-## Part 1. Implementation of the decimal.h library functions
+## Build
 
-The functions of the decimal.h library described [above](#information) must be implemented:
-- Before starting, clone the project from GitLab into a repository with the same name.
-- The library must be developed in C language of C11 standard using gcc compiler.
-- The library code must be located in the _src_ folder on the _develop_ branch.
-- Do not use outdated and legacy language constructions and library functions. Pay attention to the legacy and obsolete marks in the official documentation on the language and the libraries used. Use the POSIX.1-2017 standard.
-- When writing code it is necessary to follow the Google style for C++ ([link](https://google.github.io/styleguide/cppguide.html)).
-- Make it as a static library named *s21_decimal.a* (with the s21_decimal.h header file).
-- The library must be developed according to the principles of structured programming.
-- Use prefix s21_ before each function.
-- Prepare full coverage of library functions code with unit-tests using the Check library.
-- Unit tests must cover at least 80% of each function (checked using gcov).
-- Provide a Makefile for building the library and tests (with targets all, clean, test, s21_decimal.a, gcov_report).
-- The gcov_report target should generate a gcov report in the form of an html page. Unit tests must be run with gcov flags to do this.
-- When implementing decimal, stick to [the binary representation](#binary-representation) with the integer `bits` array as specified in the [example above](#example). Observe the position of the digits of a number in the `bits` array;
-- It is forbidden to use the __int128 type.
-- Trailing zeros can be as preserved as deleted (except for the `s21_truncate` function).
-- The defined type must support numbers from -79,228,162,514,264,337,593,543,950,335 to +79,228,162,514,264,337,593,543,950,335.
-- Your directory should not contain any files other than those specified in the assignments.
+Run build commands from `src`:
+
+```sh
+cd src
+make all
+```
+
+The output is `src/s21_decimal.a`. `make s21_decimal.a` builds the same archive directly.
+
+### Example
+
+Save the following as `example.c` in the repository root:
+
+```c
+#include <stdio.h>
+
+#include "s21_decimal.h"
+
+int main(void) {
+  s21_decimal a;
+  s21_decimal b;
+  s21_decimal sum;
+  float result = 0.0f;
+
+  if (s21_from_float_to_decimal(12.5f, &a) != 0 ||
+      s21_from_float_to_decimal(0.75f, &b) != 0 ||
+      s21_add(a, b, &sum) != 0 ||
+      s21_from_decimal_to_float(sum, &result) != 0) {
+    return 1;
+  }
+
+  printf("%.2f\n", (double)result);
+  return 0;
+}
+```
+
+Build and run the example from the repository root after building the archive:
+
+```sh
+cc -std=c11 -Wall -Wextra -Werror -pedantic -I src \
+  example.c src/s21_decimal.a -lm -o example.out
+./example.out
+```
+
+Expected output:
+
+```text
+13.25
+```
+
+## Tests
+
+From `src`:
+
+```sh
+make test
+```
+
+Tests link against the built archive and the real Check library. The current suite registers 64 tests; several tests iterate over tables of independent expected values.
+
+Coverage includes word-level arithmetic, carry and borrow, signs and scales, overflow, division by zero, signed zero, integer boundaries, float rounding, invalid metadata where validation is implemented, null output pointers, and in-place unary calls.
+
+The integer-rounding tables contain 112 vectors each for floor, round, and truncate. An additional integration suite exercises cross-module behavior.
+
+### Sanitizers
+
+```sh
+make test-sanitize
+```
+
+This target defaults to fail-fast UndefinedBehaviorSanitizer and disables Check process forking. To request AddressSanitizer as well:
+
+```sh
+make test-sanitize SANITIZERS=address,undefined
+```
+
+The selected compiler must provide the requested sanitizer runtimes. The ASan leak-detection option defaults off on macOS and on elsewhere. A successful UBSan run is not a leak-check result.
+
+### Memory checks
+
+Build the normal tests before running these commands from `src`.
+
+Linux:
+
+```sh
+CK_FORK=no valgrind --tool=memcheck --leak-check=full \
+  --show-leak-kinds=all --errors-for-leak-kinds=all \
+  --error-exitcode=99 ./.build/normal/s21_test
+```
+
+macOS:
+
+```sh
+CK_FORK=no MallocStackLogging=1 \
+  leaks --atExit -- ./.build/normal/s21_test
+```
+
+Leak-check results apply to the executed scenarios, not to every possible input.
+
+## Coverage
+
+```sh
+make gcov_report
+```
+
+Generated reports:
+
+- HTML: `src/.build/coverage/index.html`
+- JSON: `src/.build/coverage/coverage.json`
+
+The Makefile selects `gcov` for GNU GCC, `xcrun llvm-cov gcov` for Clang on macOS, and `llvm-cov gcov` for Clang on other platforms. Override `GCOV` if needed:
+
+```sh
+make gcov_report GCOV='xcrun llvm-cov gcov'
+```
+
+Normal, sanitizer, and coverage builds use separate object directories. Coverage does not replace the normal public archive. A high coverage percentage does not establish correctness by itself.
+
+## Formatting
+
+From `src`:
+
+```sh
+find . -type f \( -name '*.c' -o -name '*.h' \) \
+  -not -path './.build/*' \
+  -exec clang-format --dry-run --Werror {} +
+```
+
+The configuration in `src/.clang-format` is based on Google Style.
+
+## Core layout
+
+```text
+src/
+  s21_decimal.h
+  s21_big_decimal.h
+  Makefile
+  common/
+  arithmetic/
+  comparison/
+  conversion/
+  other/
+  tests/
+```
+
+`common` contains multiword integer operations and representation conversion. Public operations are grouped by purpose. Tests share a single runner and common fixture helpers. The legacy `check_compat` files are retained but are not included or linked by the active build.
+
+## Clean
+
+```sh
+make clean
+```
+
+This removes the normal archive, test binaries, and generated build directories.
+
+## License
+
+The existing `LICENSE` file is preserved. This README does not add or replace its licensing terms.
